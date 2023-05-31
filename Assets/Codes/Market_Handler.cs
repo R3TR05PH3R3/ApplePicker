@@ -12,20 +12,36 @@ public class Market_Handler : MonoBehaviour
     public Button[] myPurchaseBtn;
     public Material[] materials;
     public GameObject ApplePrefab;
+    private const string PurchasedKeyPrefix = "Purchased";
     private void Start()
     {
         for (int i = 0; i < shopItems.Length; i++)
         {
             shopPanelsGO[i].SetActive(true);
         }
+        for(int i = 0; i < 10; i++)
+        {
+            if (PlayerPrefs.HasKey(PurchasedKeyPrefix + i.ToString()))
+            {
+                shopItems[i].isPurchased = true;
+            }
+        }
         LoadPanels();
         CheckPurchase();
     }
     private void Update()
     {
+        for (int i = 0; i < 10; i++)
+        {
+            if (PlayerPrefs.HasKey(PurchasedKeyPrefix + i.ToString()))
+            {
+                shopItems[i].isPurchased = true;
+            }
+        }
         LoadPanels();
         CheckPurchase();
     }
+
     public void LoadPanels()
     {
         for(int i = 0; i < shopItems.Length; i++)
@@ -63,11 +79,14 @@ public class Market_Handler : MonoBehaviour
         if (CoinUI.COIN_COUNT >= shopItems[btnNo].cost && shopItems[btnNo].isPurchased == false)
         {
             CoinUI.DeduceCoins(shopItems[btnNo].cost);
-            shopItems[btnNo].isPurchased = true;
+            
             Renderer prefabRenderer = ApplePrefab.GetComponentInChildren<Renderer>();
             if (prefabRenderer != null)
             {
-                prefabRenderer.material = materials[btnNo];
+                Renderer newRenderer = Instantiate(prefabRenderer);
+                newRenderer.material = materials[btnNo];
+                ApplePrefab.GetComponent<MeshRenderer>().sharedMaterial = newRenderer.material;
+                PlayerPrefs.SetInt(PurchasedKeyPrefix + btnNo.ToString(), 1);
             }
             CheckPurchase();
         }else if(shopItems[btnNo].isPurchased == true)
@@ -75,7 +94,7 @@ public class Market_Handler : MonoBehaviour
             Renderer prefabRenderer = ApplePrefab.GetComponentInChildren<Renderer>();
             if (prefabRenderer != null)
             {
-                prefabRenderer.material = materials[btnNo];
+                ApplePrefab.GetComponent<MeshRenderer>().sharedMaterial = materials[btnNo];
             }
             CheckPurchase();
         }
@@ -91,7 +110,7 @@ public class Market_Handler : MonoBehaviour
             int currentCoinValue = PlayerPrefs.GetInt("Coin", 0);
             int newValue = currentCoinValue + 100;
             PlayerPrefs.SetInt("Coin", newValue);
-            Debug.LogWarning("PlayerPrefs Coin reset to 0.");
+            Debug.LogWarning("PlayerPrefs Coin got 100 ore coins.");
         }
     }
 }

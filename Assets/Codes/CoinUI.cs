@@ -48,17 +48,4 @@ public class CoinUI : MonoBehaviour
         // Update the UI text with the current coin count
         _UI_TEXT.text = "Total Coins: " + COIN_COUNT.ToString("#,0");
     }
-
-    [Tooltip("Check this box to reset the Coin inPlayerPrefs")]
-    public bool resetHighScoreNow = false;
-
-    void OnDrawGizmos()
-    {
-        if (resetHighScoreNow)
-        {
-            resetHighScoreNow = false;
-            PlayerPrefs.SetInt("Coin", 0);
-            Debug.LogWarning("PlayerPrefs Coin reset to 0.");
-        }
-    }
 }
